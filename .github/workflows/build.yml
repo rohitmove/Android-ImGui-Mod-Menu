@@ -1,0 +1,26 @@
+name: Build Android Native Library
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set up Android NDK
+      uses: nttld/setup-ndk@v1
+      with:
+        ndk-version: r23b
+        android-sdk-level: 31
+
+    - name: Build with NDK
+      run: |
+        cd app/src/main/jni
+        $ANDROID_NDK_HOME/ndk-build
+        
