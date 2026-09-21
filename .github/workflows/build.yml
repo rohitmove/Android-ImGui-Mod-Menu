@@ -1,0 +1,39 @@
+name: Build Android SO
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Android NDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK
+        run: sdkmanager "ndk;26.3.11579264"
+
+      - name: Build SO
+        run: |
+          export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/26.3.11579264
+          $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/clang \
+            --target=aarch64-linux-android21 \
+            -shared -fPIC \
+            native.cpp \
+            -o libnative_test.so
+
+      - name: Upload SO
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-so
+          path: libnative_test.so
